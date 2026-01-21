@@ -4,6 +4,12 @@ Sets up all paths, hyperparameters, and global settings
 """
 
 import os
+
+# Absolute path to project root
+PROJECT_ROOT = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..")
+)
+
 import torch
 from pathlib import Path
 
