@@ -20,6 +20,10 @@ import sys
 import plotly.graph_objects as go
 import plotly.express as px
 import time
+import sys
+import os
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 
 # Add current directory to path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
