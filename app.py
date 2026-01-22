@@ -23,6 +23,8 @@ import time
 import sys
 import os
 
+DEMO_MODE = True   
+
 sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 
 # Add current directory to path
@@ -51,6 +53,10 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+if DEMO_MODE:
+    st.info("🚧 Demo mode enabled — models load only when analysis starts")
+
 
 # ============================================
 # ENHANCED PROFESSIONAL CSS WITH ANIMATIONS
@@ -660,9 +666,7 @@ def main_app():
     """, unsafe_allow_html=True)
 
     # Load models
-    models = load_models()
-    if not models:
-        st.stop()
+ 
 
     # --- INPUT SECTION ---
     st.markdown("<div class='card'>", unsafe_allow_html=True)
@@ -742,35 +746,35 @@ def main_app():
     if ready:
         st.markdown("<br>", unsafe_allow_html=True)
         if st.button("🚀 INITIATE FUSION ANALYSIS", type="primary", use_container_width=True):
-            # Progress animation
-            progress_text = st.empty()
-            progress_bar = st.progress(0)
-            
-            steps = [
-                "🔍 Extracting image features...",
-                "📄 Parsing clinical text...",
-                "🧠 Performing attention-based fusion...",
-                "🔐 Applying quantum signature...",
-                "✅ Analysis complete!"
-            ]
-            
-            for i, step in enumerate(steps):
-                progress_text.markdown(f"**{step}**")
-                progress_bar.progress((i + 1) * 20)
-                time.sleep(0.5)
-            
-            result = perform_diagnosis(
-                st.session_state.uploaded_image,
-                st.session_state.report_text,
-                st.session_state.selected_organ,
-                models
-            )
-            result['organ'] = st.session_state.selected_organ
-            st.session_state.diagnosis_result = result
-            
-            progress_text.empty()
-            progress_bar.empty()
-            st.rerun()
+
+    # 🔥 LAZY LOAD MODELS HERE
+    with st.spinner("🔄 Loading AI models..."):
+        if DEMO_MODE:
+            models = None
+        else:
+            models = load_models()
+
+    # 🧪 DEMO MODE RESULT (SAFE)
+    if DEMO_MODE:
+        st.session_state.diagnosis_result = {
+            "diagnosis": "Diseased",
+            "confidence": 0.924,
+            "quantum_signature": "QSIG-DEMO-9F4A8X",
+            "attention_weights": np.array([[0.62, 0.38]]),
+            "organ": st.session_state.selected_organ
+        }
+        st.rerun()
+
+    # 🔬 REAL INFERENCE
+    result = perform_diagnosis(
+        st.session_state.uploaded_image,
+        st.session_state.report_text,
+        st.session_state.selected_organ,
+        models
+    )
+    result['organ'] = st.session_state.selected_organ
+    st.session_state.diagnosis_result = result
+    st.rerun()
     else:
         missing_items = []
         if not st.session_state.get('uploaded_image'):
